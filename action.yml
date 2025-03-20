@@ -48,7 +48,7 @@ inputs:
   kernel_source:
     description: "Select the kernel source code"
     required: false
-    default: "unifreq"
+    default: "82452588"
   kernel_version:
     description: "Select kernel version"
     required: false
