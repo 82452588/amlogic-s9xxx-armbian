@@ -160,6 +160,42 @@ runs:
             [[ -n "${{ inputs.armbian_fstype }}" ]] && make_command="${make_command} -t ${{ inputs.armbian_fstype }}"
             [[ -n "${{ inputs.armbian_size }}" ]] && make_command="${make_command} -s ${{ inputs.armbian_size }}"
             [[ -n "${{ inputs.builder_name }}" ]] && make_command="${make_command} -n ${{ inputs.builder_name }}"
+
+            kernel_version=$(echo "${{ inputs.armbian_kernel }}" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+            kernel_download_url="https://github.com/${{ inputs.kernel_repo }}/releases/download/kernel_rk35xx/${kernel_version}.tar.gz"
+            kernel_download_dir="build/output/kernel"
+            mkdir -p $kernel_download_dir
+            kernel_file="$kernel_download_dir/${kernel_version}.tar.gz"
+
+            if [ ! -f "$kernel_file" ]; then
+                echo "Downloading kernel file: $kernel_download_url"
+                curl -fsSL "$kernel_download_url" -o "$kernel_file"
+                if [ $? -ne 0 ]; then
+                    echo "Failed to download kernel file."
+                    exit 1
+                fi
+            else
+                echo "Kernel file already exists: $kernel_file"
+            fi
+
+            # 解压内核文件
+            kernel_extract_dir="$kernel_download_dir/${kernel_version}"
+            mkdir -p $kernel_extract_dir
+            tar -zxvf "$kernel_file" -C "$kernel_extract_dir"
+            if [ $? -ne 0 ]; then
+                echo "Failed to extract kernel file."
+                exit 1
+            fi
+
+            # 检查解压后的内核文件是否存在关键文件，例如 Image
+            if [ ! -f "$kernel_extract_dir/Image" ]; then
+                echo "Missing 'Image' file in the extracted kernel files."
+                exit 1
+            fi
+
+            # 传递内核文件路径给 rebuild 脚本
+            make_command="${make_command} -K $kernel_extract_dir"
+
             sudo ./rebuild ${make_command}
 
             cd ${GITHUB_ACTION_PATH}/${armbian_filepath}
