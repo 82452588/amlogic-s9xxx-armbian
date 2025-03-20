@@ -184,7 +184,6 @@ on:
           - 5.10.y
           - 5.15.y
           - 6.1.y
-          - 6.1.160
           - 6.6.y
           - 6.12.y
           - 5.4.y_5.10.y
@@ -341,7 +340,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Rebuild Armbian
-        uses: 82452588/amlogic-s9xxx-armbian@main
+        uses: ophub/amlogic-s9xxx-armbian@main
         if: ${{ steps.clean.outputs.status }} == 'success' && !cancelled()
         with:
           build_target: armbian
