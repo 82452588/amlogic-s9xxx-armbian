@@ -199,7 +199,7 @@ on:
       kernel_repo:
         description: "Set the kernel repository."
         required: false
-        default: "82452588/kernel"
+        default: "82452588/amlogic-s9xxx-armbian"
         type: choice
         options:
           - ophub/kernel
@@ -300,6 +300,7 @@ jobs:
         run: |
           armbian_buildpath="build/output/images"
           [[ -d "${armbian_buildpath}" ]] || mkdir -p "${armbian_buildpath}"
+          mkdir -p /home/runner/work/_actions/82452588/amlogic-s9xxx-armbian/main/build
           ln -sf /builder/build ${GITHUB_WORKSPACE}/build
           ln -sf /builder/build /home/runner/work/_actions/82452588/amlogic-s9xxx-armbian/main/build
 
