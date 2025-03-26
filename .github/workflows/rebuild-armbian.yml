@@ -16,7 +16,7 @@ on:
       armbian_board:
         description: "Select device board."
         required: false
-        default: "all"
+        default: "lckfb-tspi"
         type: choice
         options:
           - all
@@ -171,11 +171,12 @@ on:
       armbian_kernel:
         description: "Select kernel version."
         required: false
-        default: "6.1.y_6.12.y"
+        default: "5.10.160"
         type: choice
         options:
           - 5.4.y
           - 5.10.y
+          - 5.10.160
           - 5.15.y
           - 6.1.y
           - 6.6.y
@@ -188,15 +189,16 @@ on:
       auto_kernel:
         description: "Auto use the latest kernel."
         required: false
-        default: true
+        default: false
         type: boolean
       kernel_repo:
         description: "Set the kernel repository."
         required: false
-        default: "ophub/kernel"
+        default: "82452588/kernel"
         type: choice
         options:
           - ophub/kernel
+          - 82452588/kernel
       kernel_usage:
         description: "Set the tags of the stable kernel."
         required: false
@@ -317,15 +319,16 @@ jobs:
           done
 
           mkdir -p /builder/build
+          mkdir -p /home/runner/work/_actions/82452588/amlogic-s9xxx-armbian/main/build
           ln -sf /builder/build ${GITHUB_WORKSPACE}/build
-          ln -sf /builder/build /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/build
+          ln -sf /builder/build /home/runner/work/_actions/82452588/amlogic-s9xxx-armbian/main/build
 
           sudo timedatectl set-timezone "${TZ}"
           echo "build_tag=Armbian${set_release}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Rebuild Armbian
-        uses: ophub/amlogic-s9xxx-armbian@main
+        uses: 82452588/amlogic-s9xxx-armbian@main
         if: ${{ env.ARMBIAN_URL }} != '' && !cancelled()
         with:
           build_target: armbian
